@@ -2,10 +2,13 @@ package com.siddu.webapp.service.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.siddu.webapp.dto.UserDto;
 import com.siddu.webapp.entity.User;
+import com.siddu.webapp.mapper.UserMapper;
 import com.siddu.webapp.repository.UserRepository;
 import com.siddu.webapp.service.UserService;
 
@@ -18,31 +21,37 @@ public class UserServiceImpl implements UserService {
 	private UserRepository userRepository;
 
 	@Override
-	public User createUser(User user) {
-
-		return userRepository.save(user);
+	public UserDto createUser(UserDto userDto) {
+        
+		User user=UserMapper.mapToUser(userDto);
+		User savedUser= userRepository.save(user);
+		UserDto savedUserdto=UserMapper.mapToUserDto(savedUser);
+		return savedUserdto;
 	}
 
 	@Override
-	public User getUserById(Long userId) {
+	public UserDto getUserById(Long userId) {
 		Optional<User> optionalUser = userRepository.findById(userId);
-		return optionalUser.get();
+		 User user=optionalUser.get();
+		return UserMapper.mapToUserDto(user);
 	}
 
 	@Override
-	public List<User> getAllUsers() {
+	public List<UserDto> getAllUsers() {
 
-		return userRepository.findAll();
+		List<User> users= userRepository.findAll();
+		
+		return users.stream().map(UserMapper::mapToUserDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public User updateUser(User user) {
+	public UserDto updateUser(UserDto user) {
 		User existingUser = userRepository.findById(user.getId()).get();
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
 		existingUser.setEmail(user.getEmail());
 		User updatedUser = userRepository.save(existingUser);
-		return updatedUser;
+		return UserMapper.mapToUserDto(updatedUser);
 	}
 
 	@Override
