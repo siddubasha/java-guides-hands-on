@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.siddu.webapp.dto.UserDto;
 import com.siddu.webapp.entity.User;
+import com.siddu.webapp.exception.EmailAlreadyExistException;
+import com.siddu.webapp.exception.ResourceNotFoundException;
 import com.siddu.webapp.mapper.UserMapper;
 import com.siddu.webapp.repository.UserRepository;
 import com.siddu.webapp.service.UserService;
@@ -26,6 +28,12 @@ public class UserServiceImpl implements UserService {
 	public UserDto createUser(UserDto userDto) {
         
 	//	User user=UserMapper.mapToUser(userDto);
+		Optional<User> optionalUser=userRepository.findByEmail(userDto.getEmail());
+		
+		if(optionalUser.isPresent()) {
+			throw new EmailAlreadyExistException("Email already exist for user");
+		}
+		
 		User user=modelMapper.map(userDto, User.class);
 		User savedUser= userRepository.save(user);
 	//	UserDto savedUserdto=UserMapper.mapToUserDto(savedUser);
@@ -35,8 +43,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto getUserById(Long userId) {
-		Optional<User> optionalUser = userRepository.findById(userId);
-		 User user=optionalUser.get();
+		User user= userRepository.findById(userId).orElseThrow(
+				()->new ResourceNotFoundException("User", "Id", userId)
+				);
 		//return UserMapper.mapToUserDto(user);
 		 return modelMapper.map(user, UserDto.class);
 	}
@@ -52,7 +61,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDto updateUser(UserDto user) {
-		User existingUser = userRepository.findById(user.getId()).get();
+		User existingUser = userRepository.findById(user.getId()).orElseThrow(
+				()->new ResourceNotFoundException("User", "Id", user.getId())
+				);
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
 		existingUser.setEmail(user.getEmail());
@@ -63,7 +74,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void deleteUser(Long userId) {
-        
+		User existingUser = userRepository.findById(userId).orElseThrow(
+				()->new ResourceNotFoundException("User", "Id", userId)
+				);
+		
 		userRepository.deleteById(userId);
 	}
 
