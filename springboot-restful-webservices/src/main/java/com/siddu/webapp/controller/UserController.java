@@ -23,6 +23,7 @@ import com.siddu.webapp.exception.ErrorDetails;
 import com.siddu.webapp.exception.ResourceNotFoundException;
 import com.siddu.webapp.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -35,7 +36,7 @@ public class UserController {
 	// build create user REST API
 	// http://localhost:8081/api/users
 	@PostMapping
-	public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
 		UserDto savedUserDto = userService.createUser(userDto);
 		return new ResponseEntity<UserDto>(savedUserDto, HttpStatus.CREATED);
 	}
@@ -61,7 +62,7 @@ public class UserController {
 	// build update user REST API
 	// http://localhost:8081/api/users
 	@PutMapping("{id}")
-	public ResponseEntity<UserDto> updaterUser(@PathVariable("id") Long userId, @RequestBody UserDto user) {
+	public ResponseEntity<UserDto> updaterUser(@PathVariable("id") Long userId,@Valid @RequestBody UserDto user) {
 		user.setId(userId);
 		UserDto updatedUser = userService.updateUser(user);
 		return new ResponseEntity<UserDto>(updatedUser, HttpStatus.OK);
