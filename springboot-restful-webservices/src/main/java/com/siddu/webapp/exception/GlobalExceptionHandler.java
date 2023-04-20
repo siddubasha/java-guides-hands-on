@@ -68,7 +68,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	
-	
+	// below method will handle exceptions or error at time of validation data of userdto entity
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex,
