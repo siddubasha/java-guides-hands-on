@@ -4,7 +4,9 @@ import org.springframework.context.annotation.Bean;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -15,12 +17,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.AllArgsConstructor;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableMethodSecurity // this annotation enables PreAuthorise annotation
+@AllArgsConstructor
 public class SpringSecurityConfig {
 
+	private UserDetailsService userDetailsService;
+	
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeHttpRequests(authorize -> {
@@ -39,12 +46,19 @@ public class SpringSecurityConfig {
 		return http.build();
 
 	}
-
+     
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+		 return configuration.getAuthenticationManager();
+	}
+	
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
+/* commenting because of using Database authentication instead of In_Memory authentication and also comment 
+ * user info(username, password,role) in properties file beacuser their info is exist in database as tables
 	@Bean
 	UserDetailsService userDetailsService() {
 
@@ -57,4 +71,5 @@ public class SpringSecurityConfig {
 		return new InMemoryUserDetailsManager(user1, user2);
 
 	}
+	*/
 }
